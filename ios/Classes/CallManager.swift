@@ -40,6 +40,14 @@ class CallManager: NSObject {
             self.sharedProvider?.reportCall(with: uuid!, updated: callUpdate)
         })
     }
+
+    func didAcceptCall(call: Call) {
+        let answerCallAction = CXAnswerCallAction(call: call.uuid)
+        let callTransaction = CXTransaction()
+        callTransaction.addAction(answerCallAction)
+        //requestCall
+        self.requestCall(callTransaction, action: "acceptCall")
+    }
     
     func endCall(call: Call) {
         let endCallAction = CXEndCallAction(call: call.uuid)

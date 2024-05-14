@@ -173,7 +173,11 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
     }
 
     @objc public func didAcceptCall(_ data: Data) {
-        self.sharedProvider?.reportOutgoingCall(with: UUID(uuidString: data.uuid)!, connectedAt: Date())
+        if let uuid = UUID(uuidString: data.uuid) {
+            let call: Call? = self.callManager?.callWithUUID(uuid: uuid)
+            if(call == nil) {return}
+            self.callManager?.didAcceptCall(call: call!)
+        }
     }
     
     @objc public func startCall(_ data: Data, fromPushKit: Bool) {
