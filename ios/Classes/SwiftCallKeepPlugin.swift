@@ -112,6 +112,17 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
         case "getDevicePushTokenVoIP":
             result(self.getDevicePushTokenVoIP())
             break;
+        case "didAcceptCall":
+            guard let args = call.arguments else {
+                result(FlutterError.nilArgument)
+                return
+            }
+            if let getArgs = args as? [String: Any] {
+                self.data = Data(args: getArgs)
+                self.didAcceptCall(self.data!)
+            }
+            result("OK")
+            break
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -159,6 +170,10 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
                 self.endCallNotExist(data)
             }
         }
+    }
+
+    @objc public func didAcceptCall(_ data: Data) {
+        self.sharedProvider?.reportOutgoingCall(with: UUID(uuidString: data.uuid)!, connectedAt: Date())
     }
     
     @objc public func startCall(_ data: Data, fromPushKit: Bool) {

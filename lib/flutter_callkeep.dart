@@ -116,6 +116,13 @@ class CallKeep {
         '';
   }
 
+  /// Sends the event that the call was accepted.
+  /// On iOS, using Callkit(update a history into the Phone app).
+  /// On Android, Nothing(only callback event listener).
+  Future<void> didAcceptCall(String uuid) async {
+    await _channel.invokeMethod("didAcceptCall", {'id': uuid});
+  }
+
   CallKeepEvent _handleCallKeepEvent(dynamic data) {
     if (data is Map) {
       try {
