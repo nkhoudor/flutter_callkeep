@@ -41,6 +41,12 @@ base class CallKeepPlatform {
         'showMissCallNotification has not been implemented.');
   }
 
+  /// Report Call Ended Reason.
+  Future<void> reportCallEndedReason(CallEvent data) async {
+    throw UnimplementedError(
+        'reportCallEndedReason has not been implemented.');
+  }
+
   /// Start an Outgoing call.
   Future<void> startCall(CallEvent data) {
     throw UnimplementedError('startCall has not been implemented.');

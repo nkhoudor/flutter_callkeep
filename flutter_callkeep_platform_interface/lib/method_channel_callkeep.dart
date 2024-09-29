@@ -45,6 +45,14 @@ final class MethodChannelCallKeep extends CallKeepPlatform {
   }
 
   @override
+  Future<void> reportCallEndedReason(CallEvent data) async {
+    await methodChannel.invokeMethod(
+      "reportCallEndedReason",
+      _callData(data),
+    );
+  }
+
+  @override
   Future<void> startCall(CallEvent data) async {
     await methodChannel.invokeMethod("startCall", _callData(data));
   }
