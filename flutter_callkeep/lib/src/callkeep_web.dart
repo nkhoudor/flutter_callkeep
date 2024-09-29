@@ -51,6 +51,11 @@ final class CallKeepWebPlugin extends CallKeepPlatform {
   }
 
   @override
+  Future<void> reportCallEndedReason(CallEvent data) async {
+    return;
+  }
+
+  @override
   Future<void> acceptCall(String uuid) async {
     final callIndex = _calls.indexWhere((element) => element.uuid == uuid);
     // If the call is not found, return.

@@ -56,6 +56,11 @@ class CallKeep {
   Future<void> showMissCallNotification(CallEvent data) async {
     return _platform.showMissCallNotification(data);
   }
+  
+  /// Show Miss Call Notification.
+  Future<void> reportCallEndedReason(CallEvent data) async {
+    return _platform.reportCallEndedReason(data);
+  }
 
   /// Start an Outgoing call.
   Future<void> startCall(CallEvent data) {

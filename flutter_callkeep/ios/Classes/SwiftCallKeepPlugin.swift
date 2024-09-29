@@ -80,6 +80,17 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
         case "showMissCallNotification":
             result("OK")
             break
+        case "reportCallEndedReason":
+            guard let args = call.arguments else {
+                result(FlutterError.nilArgument)
+                return
+            }
+            if let getArgs = args as? [String: Any] {
+                self.data = Data(args: getArgs)
+                reportCallEndedReason(data!)
+            }
+            result("OK")
+            break
         case "startCall":
             guard let args = call.arguments else {
                 result(FlutterError.nilArgument)
@@ -137,7 +148,7 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
         return UserDefaults.standard.string(forKey: devicePushTokenVoIP) ?? ""
     }
     
-    @objc public func displayIncomingCall(_ data: Data, fromPushKit: Bool) {
+    @objc public func displayIncomingCall(_ data: Data, fromPushKit: Bool, completion: (() -> Void)? = nil) {
         self.isFromPushKit = fromPushKit
         if(fromPushKit){
             self.data = data
@@ -168,6 +179,18 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
                 self.callManager?.addCall(call)
                 self.sendEvent(SwiftCallKeepPlugin.ACTION_CALL_INCOMING, data.toJSON())
                 self.endCallNotExist(data)
+            }
+            completion?()
+        }
+    }
+    
+    @objc public func reportCallEndedReason(_ data: Data) {
+        if let uuid = UUID(uuidString: data.uuid) {
+            initCallkitProvider(data)
+            let callEndedReason = getCallEndedReason(data.extra["callEndedReason"] as? String)
+            sharedProvider?.reportCall(with: uuid, endedAt: nil, reason: callEndedReason)
+            if let call = callManager?.callWithUUID(uuid: uuid) {
+                callManager?.removeCall(call)
             }
         }
     }
@@ -268,6 +291,30 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
         return typeDefault
     }
     
+    func getCallEndedReason(_ reason: String?) -> CXCallEndedReason {
+        var defaultReason = CXCallEndedReason.remoteEnded
+        switch reason {
+        case "failed":
+            defaultReason = CXCallEndedReason.failed
+            break
+        case "remoteEnded":
+            defaultReason = CXCallEndedReason.remoteEnded
+            break
+        case "unanswered":
+            defaultReason = CXCallEndedReason.unanswered
+            break
+        case "answeredElsewhere":
+            defaultReason = CXCallEndedReason.answeredElsewhere
+            break
+        case "declinedElsewhere":
+            defaultReason = CXCallEndedReason.declinedElsewhere
+            break
+        default:
+            defaultReason = CXCallEndedReason.remoteEnded
+        }
+        return defaultReason
+    }
+    
     func initCallkitProvider(_ data: Data) {
         if(self.sharedProvider == nil){
             self.sharedProvider = CXProvider(configuration: createConfiguration(data))
@@ -291,7 +338,7 @@ public class SwiftCallKeepPlugin: NSObject, FlutterPlugin, CXProviderDelegate {
             configuration.includesCallsInRecents = data.includesCallsInRecents
         }
         if !data.iconName.isEmpty {
-            if let image = UIImage(named: data.iconName) {
+            if let image = UIImage(named: "LaunchImage") {
                 configuration.iconTemplateImageData = image.pngData()
             } else {
                 print("Unable to load icon \(data.iconName).");

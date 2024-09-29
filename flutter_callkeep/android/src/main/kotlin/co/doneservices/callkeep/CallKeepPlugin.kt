@@ -138,6 +138,9 @@ class CallKeepPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     )
                     result.success("OK")
                 }
+                "reportCallEndedReason" -> {
+                    result.success("OK")
+                }
                 "showMissCallNotification" -> {
                     val data = Data(call.arguments()?: HashMap<String, Any?>())
                     data.from = "notification"
