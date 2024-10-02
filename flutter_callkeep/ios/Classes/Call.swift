@@ -92,6 +92,7 @@ public class Call: NSObject {
         self.uuid = uuid
         self.data = data
         self.isOutGoing = isOutGoing
+        self.data.isOutgoing = isOutGoing
     }
     
     var startCallCompletion: ((Bool) -> Void)?
@@ -124,6 +125,7 @@ public class Call: NSObject {
     @objc public var isAccepted: Bool
     @objc public var duration: Int
     @objc public var extra: NSDictionary
+    @objc public var isOutgoing: Bool
     
     //iOS
     @objc public var iconName: String
@@ -145,14 +147,15 @@ public class Call: NSObject {
     @objc public init(id: String, callerName: String, handle: String, hasVideo: Bool) {
         self.uuid = id
         self.callerName = callerName
-        self.appName = "CallKeep"
+        self.appName = "LeDunia"
         self.handle = handle
         self.avatar = ""
         self.hasVideo = hasVideo
         self.isAccepted = false
         self.duration = 30000
         self.extra = [:]
-        self.iconName = "CallKeepLogo"
+        self.isOutgoing = false
+        self.iconName = "LaunchImage"
         self.handleType = ""
         self.supportsVideo = true
         self.maximumCallGroups = 2
@@ -180,17 +183,18 @@ public class Call: NSObject {
     public init(args: [String: Any?]) {
         self.uuid = args["id"] as? String ?? ""
         self.callerName = args["callerName"] as? String ?? ""
-        self.appName = args["appName"] as? String ?? "CallKeep"
+        self.appName = args["appName"] as? String ?? "LeDunia"
         self.handle = args["handle"] as? String ?? ""
         self.avatar = args["avatar"] as? String ?? ""
         self.hasVideo = args["hasVideo"] as? Bool ?? false
         self.isAccepted = args["isAccepted"] as? Bool ?? false
         self.duration = args["duration"] as? Int ?? 30000
         self.extra = args["extra"] as? NSDictionary ?? [:]
+        self.isOutgoing = args["isOutgoing"] as? Bool ?? false
         
         
         if let ios = args["ios"] as? [String: Any] {
-            self.iconName = ios["iconName"] as? String ?? "CallKeepLogo"
+            self.iconName = ios["iconName"] as? String ?? "LaunchImage"
             self.handleType = ios["handleType"] as? String ?? ""
             self.supportsVideo = ios["supportsVideo"] as? Bool ?? true
             self.maximumCallGroups = ios["maximumCallGroups"] as? Int ?? 2
@@ -253,6 +257,7 @@ public class Call: NSObject {
             "isAccepted": isAccepted,
             "duration": duration,
             "extra": extra,
+            "isOutgoing": isOutgoing,
             "ios": ios
         ] as [String : Any?]
         return map
